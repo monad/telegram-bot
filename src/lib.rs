@@ -75,6 +75,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc;
 use std::thread;
+use std::time::Duration;
 use hyper::{Client, Url};
 use hyper::client::IntoUrl;
 use hyper::client::request::Request;
@@ -84,6 +85,7 @@ use multipart::client::Multipart;
 
 /// API-URL prefix
 pub const API_URL : &'static str = "https://api.telegram.org/bot";
+const HTTP_TIMEOUT_MS: u64 = 5000;
 
 // RequestType let you choose between a post request or a multipart request
 enum RequestType {
@@ -108,15 +110,6 @@ pub struct Api {
     client: Client,
 }
 
-impl Clone for Api {
-    fn clone(&self) -> Api {
-        Api {
-            url: self.url.clone(),
-            client: Client::new(),
-        }
-    }
-}
-
 impl Api {
     // =======================================================================
     // Constructors
@@ -131,9 +124,14 @@ impl Api {
             Ok(url) => url,
             Err(e) => return Err(Error::InvalidTokenFormat(e)),
         };
+        let mut c = Client::new();
+        let dur = Some(Duration::from_millis(HTTP_TIMEOUT_MS));
+        c.set_read_timeout(dur);
+        c.set_write_timeout(dur);
+
         Ok(Api {
             url: url,
-            client: Client::new(),
+            client: c,
         })
     }
 
@@ -147,6 +145,14 @@ impl Api {
         };
 
         Self::from_token(&token)
+    }
+
+    /// Sets the HTTP-timeout for active requests done through this `Api`
+    /// instance. This has nothing to do with the timeout for the `LongPoll`
+    /// listening method!
+    pub fn set_send_timeout(&mut self, dur: Duration) {
+        self.client.set_read_timeout(Some(dur));
+        self.client.set_write_timeout(Some(dur));
     }
 
 
@@ -430,11 +436,17 @@ impl Api {
     // }
 
     pub fn listener(&self, method: ListeningMethod) -> Listener {
+        let mut c = Client::new();
+        if let ListeningMethod::LongPoll(Some(timeout)) = method {
+            let dur = Some(Duration::from_secs(timeout as u64));
+            c.set_read_timeout(dur);
+            c.set_write_timeout(dur);
+        }
         Listener {
             method: method,
             confirmed: 0,
             url: self.url.clone(),
-            client: Client::new(),
+            client: c,
         }
     }
 
