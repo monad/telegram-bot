@@ -20,7 +20,7 @@ use std::fmt;
 // Macro to implement "Encodable" quickly. "None" fields won't be encoded.
 macro_rules! impl_encode {
     (
-        $ty:ident, $count:expr,
+        $ty:ty, $count:expr,
         [$($id:expr => $field:ident),*],
         [$($o_id:expr => $o_field:ident),*]
     ) => {
@@ -28,9 +28,18 @@ macro_rules! impl_encode {
             fn encode<E: Encoder>(&self, e: &mut E) -> Result<(), E::Error> {
                 e.emit_struct(stringify!($ty), $count, |e| {
                     $(
-                        try!(e.emit_struct_field(stringify!($field), $id, |e| {
-                            self.$field.encode(e)
-                        }));
+                        // Irritating special case.
+                        if stringify!($field) == "_type" {
+                            try!(e.emit_struct_field("type", $id, |e| {
+                                self.$field.encode(e)
+                            }));
+                        }
+
+                        else {                        
+                            try!(e.emit_struct_field(stringify!($field), $id, |e| {
+                                self.$field.encode(e)
+                            }));
+                        }
                     )*
                     $(
                         if let Some(ref v) = self.$o_field {
@@ -628,7 +637,8 @@ pub struct Location {
 #[derive(RustcDecodable, Debug, PartialEq, Clone)]
 pub struct Update {
     pub update_id: Integer,
-    pub message: Option<Message>
+    pub message: Option<Message>,
+    pub inline_query: Option<InlineQuery>
 }
 
 // impl_encode!(Update, 2,
@@ -667,6 +677,88 @@ impl Default for ReplyKeyboardMarkup {
 impl_encode!(ReplyKeyboardMarkup, 4,
     [0 => keyboard],
     [1 => resize_keyboard, 2 => one_time_keyboard, 3 => selective]);
+
+// ---------------------------------------------------------------------------
+#[derive(RustcDecodable, Debug, PartialEq, Clone)]
+pub struct InlineQuery {
+    pub id: String,
+    pub from: User,
+    pub location: Option<Location>,
+    pub query: String,
+    pub offset: String
+}
+
+// ---------------------------------------------------------------------------
+/// Simulate subtyping by using a trait InlineQueryResult to constrain
+/// the various types of Result available.
+pub trait InlineQueryResult {}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultCachedAudio<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub audio_file_id: String,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>
+}
+
+impl_encode!(InlineQueryResultCachedAudio<InputTextMessageContent>, 5,
+    [0 => _type, 1 => id, 2 => audio_file_id],
+    [3 => reply_markup, 4 => input_message_content]);
+impl_encode!(InlineQueryResultCachedAudio<InputTextMessageContent>, 5,
+    [0 => _type, 1 => id, 2 => audio_file_id],
+    [3 => reply_markup, 4 => input_message_content]);
+                     
+// ---------------------------------------------------------------------------
+#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+pub struct InlineKeyboardButton {
+    pub text: String,
+    pub url: Option<String>,
+    pub callback_data: Option<String>,
+    pub switch_inline_query: Option<String>
+}
+
+#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+pub struct InlineKeyboardMarkup {
+    pub inline_keyboard: Vec<Vec<InlineKeyboardButton>>
+}
+
+// ---------------------------------------------------------------------------
+/// InputMessageContent and 'subtypes'.
+pub trait InputMessageContent {}
+
+#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+pub struct InputTextMessageContent {
+    pub message_text: String,
+    pub parse_mode: Option<String>,
+    pub disable_web_page_preview: Option<bool>
+}
+
+impl InputMessageContent for InputTextMessageContent {}
+
+#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+pub struct InputLocationMessageContent {
+    pub latitude: f32,
+    pub longitude: f32
+}
+
+impl InputMessageContent for InputLocationMessageContent
+                     
+#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+pub struct InputVenueMessageContent {
+    pub latitude: f32,
+    pub longitude: f32,
+    pub title: String,
+    pub address: String,
+    pub foursquare_id: Option<String>
+}
+
+#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+pub struct InputContactMessageContent {
+    pub phone_number: String,
+    pub first_name: String,
+    pub last_name: Option<String>
+}
 
 // ===========================================================================
 // Unit tests (mainly encode & decode)
