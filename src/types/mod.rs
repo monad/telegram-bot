@@ -705,7 +705,7 @@ pub struct InlineQueryResultCachedAudio<K: InputMessageContent> {
 impl_encode!(InlineQueryResultCachedAudio<InputTextMessageContent>, 5,
     [0 => _type, 1 => id, 2 => audio_file_id],
     [3 => reply_markup, 4 => input_message_content]);
-impl_encode!(InlineQueryResultCachedAudio<InputTextMessageContent>, 5,
+impl_encode!(InlineQueryResultCachedAudio<InputLocationMessageContent>, 5,
     [0 => _type, 1 => id, 2 => audio_file_id],
     [3 => reply_markup, 4 => input_message_content]);
                      
@@ -742,7 +742,7 @@ pub struct InputLocationMessageContent {
     pub longitude: f32
 }
 
-impl InputMessageContent for InputLocationMessageContent
+impl InputMessageContent for InputLocationMessageContent {}
                      
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InputVenueMessageContent {
