@@ -753,12 +753,16 @@ pub struct InputVenueMessageContent {
     pub foursquare_id: Option<String>
 }
 
+impl InputMessageContent for InputVenueMessageContent {}
+
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InputContactMessageContent {
     pub phone_number: String,
     pub first_name: String,
     pub last_name: Option<String>
 }
+
+impl InputMessageContent for InputContactMessageContent {}
 
 // ===========================================================================
 // Unit tests (mainly encode & decode)
