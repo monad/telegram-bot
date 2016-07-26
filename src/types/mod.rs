@@ -57,6 +57,28 @@ macro_rules! impl_encode {
     }
 }
 
+// Calls impl_encode for each subtype of InputMessageContent.
+macro_rules! encode_subtypes {
+    (
+        $iqr:ident,
+        [$($id:expr => $field:ident),*],
+        [$($o_id:expr => $o_field:ident),*]
+    ) => {
+        impl_encode!($iqr<InputTextMessageContent>, 11,
+                     [$( $id => $field ), *],
+                     [$( $o_id => $o_field ), *]);
+        impl_encode!($iqr<InputLocationMessageContent>, 11,
+                     [$( $id => $field ), *],
+                     [$( $o_id => $o_field ), *]);
+        impl_encode!($iqr<InputVenueMessageContent>, 11,
+                     [$( $id => $field ), *],
+                     [$( $o_id => $o_field ), *]);
+        impl_encode!($iqr<InputContactMessageContent>, 11,
+                     [$( $id => $field ), *],
+                     [$( $o_id => $o_field ), *]);
+    }
+}
+
 // Decodes a field with a given name. If successful: Return decoded
 // value. If not: Exit function with error value.
 macro_rules! try_field {
@@ -710,23 +732,10 @@ pub struct InlineQueryResultArticle<K: InputMessageContent> {
 
 impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultArticle<T> {}
 
-impl_encode!(InlineQueryResultArticle<InputTextMessageContent>, 11,
-             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
-             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
-              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
-impl_encode!(InlineQueryResultArticle<InputLocationMessageContent>, 11,
-             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
-             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
-              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
-impl_encode!(InlineQueryResultArticle<InputVenueMessageContent>, 11,
-             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
-             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
-              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
-impl_encode!(InlineQueryResultArticle<InputContactMessageContent>, 11,
-             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
-             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
-              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
-
+encode_subtypes!(InlineQueryResultArticle,
+                 [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
+                 [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
+                  8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
 
 // #[derive(Debug, PartialEq, Clone)]
 // pub struct InlineQueryResultCachedAudio<K: InputMessageContent> {
