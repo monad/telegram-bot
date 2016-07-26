@@ -715,6 +715,7 @@ pub struct InlineQuery {
 /// the various types of Result available.
 pub trait InlineQueryResult {}
 
+// ---------------------------------------------------------------------------
 #[derive(Debug, PartialEq, Clone)]
 pub struct InlineQueryResultArticle<K: InputMessageContent> {
     pub _type: String,
@@ -737,15 +738,26 @@ encode_subtypes!(InlineQueryResultArticle,
                  [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
                   8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
 
-// #[derive(Debug, PartialEq, Clone)]
-// pub struct InlineQueryResultCachedAudio<K: InputMessageContent> {
-//     pub _type: String,
-//     pub id: String,
-//     pub audio_file_id: String,
-//     pub reply_markup: Option<InlineKeyboardMarkup>,
-//     pub input_message_content: Option<K>
-// }
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct<K: InputMessageContent> InlineQueryResultPhoto {
+    pub _type: String,
+    pub id: String,
+    pub photo_url: String,
+    pub thumb_url: String,
+    pub photo_width: Option<Integer>,
+    pub photo_height: Option<Integer>,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub caption: Option<String>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>
+}
 
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultPhoto<T> {}
+
+encode_subtypes!(InlineQueryResultPhoto, 12,
+                 [0 => _type, 1 => id, 2 => 
 // ---------------------------------------------------------------------------
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InlineKeyboardButton {
