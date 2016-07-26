@@ -60,20 +60,20 @@ macro_rules! impl_encode {
 // Calls impl_encode for each subtype of InputMessageContent.
 macro_rules! encode_subtypes {
     (
-        $iqr:ident,
+        $iqr:ident, $count:expr,
         [$($id:expr => $field:ident),*],
         [$($o_id:expr => $o_field:ident),*]
     ) => {
-        impl_encode!($iqr<InputTextMessageContent>, 11,
+        impl_encode!($iqr<InputTextMessageContent>, $count,
                      [$( $id => $field ), *],
                      [$( $o_id => $o_field ), *]);
-        impl_encode!($iqr<InputLocationMessageContent>, 11,
+        impl_encode!($iqr<InputLocationMessageContent>, $count,
                      [$( $id => $field ), *],
                      [$( $o_id => $o_field ), *]);
-        impl_encode!($iqr<InputVenueMessageContent>, 11,
+        impl_encode!($iqr<InputVenueMessageContent>, $count,
                      [$( $id => $field ), *],
                      [$( $o_id => $o_field ), *]);
-        impl_encode!($iqr<InputContactMessageContent>, 11,
+        impl_encode!($iqr<InputContactMessageContent>, $count,
                      [$( $id => $field ), *],
                      [$( $o_id => $o_field ), *]);
     }
@@ -733,14 +733,14 @@ pub struct InlineQueryResultArticle<K: InputMessageContent> {
 
 impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultArticle<T> {}
 
-encode_subtypes!(InlineQueryResultArticle,
+encode_subtypes!(InlineQueryResultArticle, 11
                  [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
                  [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
                   8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
 
 // ---------------------------------------------------------------------------
 #[derive(Debug, PartialEq, Clone)]
-pub struct<K: InputMessageContent> InlineQueryResultPhoto {
+pub struct InlineQueryResultPhoto<K: InputMessageContent> {
     pub _type: String,
     pub id: String,
     pub photo_url: String,
@@ -757,7 +757,32 @@ pub struct<K: InputMessageContent> InlineQueryResultPhoto {
 impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultPhoto<T> {}
 
 encode_subtypes!(InlineQueryResultPhoto, 12,
-                 [0 => _type, 1 => id, 2 => 
+                 [0 => _type, 1 => id, 2 => photo_url, 3 => thumb_url],
+                 [4 => photo_width, 5 => photo_height, 6 => title,
+                  7 => description, 8 => caption, 9 => reply_markup,
+                  10 => input_message_content]);
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultGif<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub gif_url: String,
+    pub gif_width: Option<Integer>,
+    pub gif_height: Option<Integer>,
+    pub thumb_url: String,
+    pub title: Option<String>,
+    pub caption: Option<String>,
+    pub reply_markup: InlineKeyboardMarkup,
+    pub input_message_content: Option<K>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultGif<T> {}
+
+encode_subtypes!(InlineQueryResultGif, 10,
+                 [0 => _type, 1 => id, 2 => gif_url, 5 => thumb_url],
+                 [3 => gif_width, 4 => gif_height, 6 => title, 7 => caption,
+                  8 => reply_markup, 9 => input_message_content]);
+
 // ---------------------------------------------------------------------------
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InlineKeyboardButton {
