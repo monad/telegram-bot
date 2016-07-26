@@ -694,21 +694,49 @@ pub struct InlineQuery {
 pub trait InlineQueryResult {}
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct InlineQueryResultCachedAudio<K: InputMessageContent> {
+pub struct InlineQueryResultArticle<K: InputMessageContent> {
     pub _type: String,
     pub id: String,
-    pub audio_file_id: String,
+    pub title: String,
+    pub input_message_content: K,
     pub reply_markup: Option<InlineKeyboardMarkup>,
-    pub input_message_content: Option<K>
+    pub url: Option<String>,
+    pub hide_url: Option<bool>,
+    pub description: Option<String>,
+    pub thumb_url: Option<String>,
+    pub thumb_width: Option<Integer>,
+    pub thumb_height: Option<Integer>
 }
 
-impl_encode!(InlineQueryResultCachedAudio<InputTextMessageContent>, 5,
-    [0 => _type, 1 => id, 2 => audio_file_id],
-    [3 => reply_markup, 4 => input_message_content]);
-impl_encode!(InlineQueryResultCachedAudio<InputLocationMessageContent>, 5,
-    [0 => _type, 1 => id, 2 => audio_file_id],
-    [3 => reply_markup, 4 => input_message_content]);
-                     
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultArticle<T> {}
+
+impl_encode!(InlineQueryResultArticle<InputTextMessageContent>, 11,
+             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
+             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
+              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
+impl_encode!(InlineQueryResultArticle<InputLocationMessageContent>, 11,
+             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
+             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
+              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
+impl_encode!(InlineQueryResultArticle<InputVenueMessageContent>, 11,
+             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
+             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
+              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
+impl_encode!(InlineQueryResultArticle<InputContactMessageContent>, 11,
+             [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
+             [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
+              8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
+
+
+// #[derive(Debug, PartialEq, Clone)]
+// pub struct InlineQueryResultCachedAudio<K: InputMessageContent> {
+//     pub _type: String,
+//     pub id: String,
+//     pub audio_file_id: String,
+//     pub reply_markup: Option<InlineKeyboardMarkup>,
+//     pub input_message_content: Option<K>
+// }
+
 // ---------------------------------------------------------------------------
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InlineKeyboardButton {
@@ -727,27 +755,30 @@ pub struct InlineKeyboardMarkup {
 /// InputMessageContent and 'subtypes'.
 pub trait InputMessageContent {}
 
-#[derive(RustcEncodable, Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct InputTextMessageContent {
     pub message_text: String,
     pub parse_mode: Option<String>,
     pub disable_web_page_preview: Option<bool>
 }
 
+impl_encode!(InputTextMessageContent, 3, [0 => message_text],
+             [1 => parse_mode, 2 => disable_web_page_preview]);
+             
 impl InputMessageContent for InputTextMessageContent {}
 
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InputLocationMessageContent {
-    pub latitude: f32,
-    pub longitude: f32
+    pub latitude: Float,
+    pub longitude: Float
 }
 
 impl InputMessageContent for InputLocationMessageContent {}
                      
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
 pub struct InputVenueMessageContent {
-    pub latitude: f32,
-    pub longitude: f32,
+    pub latitude: Float,
+    pub longitude: Float,
     pub title: String,
     pub address: String,
     pub foursquare_id: Option<String>

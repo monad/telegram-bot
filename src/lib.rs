@@ -159,6 +159,29 @@ impl Api {
         self.send_request("getMe", Params::new(), RequestType::Post)
     }
 
+    /// Corresponds to the "answerInlineQuery" method of the API.
+    pub fn answer_inline_query<R: InlineQueryResult + rustc_serialize::Encodable>(
+        &self,
+        inline_query_id: String,
+        results: Vec<R>,
+        cache_time: Option<Integer>,
+        is_personal: Option<bool>,
+        next_offset: Option<String>,
+        switch_pm_text: Option<String>,
+        switch_pm_parameter: Option<String>) -> Result<bool> {
+
+        let mut params = Params::new();
+        params.add_get("inline_query_id", inline_query_id);
+        params.add_get("results", try!(json::encode(&results)));
+        params.add_get_opt("cache_time", cache_time);
+        params.add_get_opt("is_personal", is_personal);
+        params.add_get_opt("next_offset", next_offset);
+        params.add_get_opt("switch_pm_text", switch_pm_text);
+        params.add_get_opt("switch_pm_parameter", switch_pm_parameter);
+        self.send_request("answerInlineQuery", params, RequestType::Post)
+    }
+                                                     
+
     /// Corresponds to the "sendMessage" method of the API.
     pub fn send_message(&self, chat_id: Integer, text: String,
                         parse_mode: Option<ParseMode>,
