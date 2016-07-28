@@ -733,7 +733,7 @@ pub struct InlineQueryResultArticle<K: InputMessageContent> {
 
 impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultArticle<T> {}
 
-encode_subtypes!(InlineQueryResultArticle, 11
+encode_subtypes!(InlineQueryResultArticle, 11,
                  [0 => _type, 1 => id, 2 => title, 3 => input_message_content],
                  [4 => reply_markup, 5 => url, 6 => hide_url, 7 => description,
                   8 => thumb_url, 9 => thumb_width, 10 => thumb_height]);
@@ -772,7 +772,7 @@ pub struct InlineQueryResultGif<K: InputMessageContent> {
     pub thumb_url: String,
     pub title: Option<String>,
     pub caption: Option<String>,
-    pub reply_markup: InlineKeyboardMarkup,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
     pub input_message_content: Option<K>
 }
 
@@ -782,6 +782,168 @@ encode_subtypes!(InlineQueryResultGif, 10,
                  [0 => _type, 1 => id, 2 => gif_url, 5 => thumb_url],
                  [3 => gif_width, 4 => gif_height, 6 => title, 7 => caption,
                   8 => reply_markup, 9 => input_message_content]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultMpeg4Gif<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub mpeg4_url: String,
+    pub mpeg4_width: Option<Integer>,
+    pub mpeg4_height: Option<Integer>,
+    pub thumb_url: String,
+    pub title: Option<String>,
+    pub caption: Option<String>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultMpeg4Gif<T> {}
+
+encode_subtypes!(InlineQueryResultMpeg4Gif, 10,
+                 [0 => _type, 1 => id, 2 => mpeg4_url, 5 => thumb_url],
+                 [3 => mpeg4_width, 4 => mpeg4_height, 6 => title,
+                  7 => caption, 8 => reply_markup, 9 => input_message_content]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultVideo<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub video_url: String,
+    pub mime_type: String,
+    pub thumb_url: String,
+    pub title: String,
+    pub caption: Option<String>,
+    pub video_width: Option<Integer>,
+    pub video_height: Option<Integer>,
+    pub video_duration: Option<Integer>,
+    pub description: Option<String>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultVideo<T> {}
+
+encode_subtypes!(InlineQueryResultVideo, 13,
+                 [0 => _type, 1 => id, 2 => video_url, 3 => mime_type,
+                  4 => thumb_url, 5 => title],
+                 [6 => caption, 7 => video_width, 8 => video_height,
+                  9 => video_duration, 10 => description, 11 => reply_markup,
+                  12 => input_message_content]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultAudio<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub audio_url: String,
+    pub title: String,
+    pub performer: Option<String>,
+    pub audio_duration: Option<Integer>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultAudio<T> {}
+
+encode_subtypes!(InlineQueryResultAudio, 8,
+                 [0 => _type, 1 => id, 2 => audio_url, 3 => title],
+                 [4 => performer, 5 => audio_duration, 6 => reply_markup,
+                  7 => input_message_content]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultVoice<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub voice_url: String,
+    pub title: String,
+    pub voice_duration: Option<Integer>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultVoice<T> {}
+
+encode_subtypes!(InlineQueryResultVoice, 7,
+                 [0 => _type, 1 => id, 2 => voice_url, 3 => title],
+                 [4 => voice_duration, 5 => reply_markup,
+                  6 => input_message_content]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultDocument<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub title: String,
+    pub caption: Option<String>,
+    pub document_url: String,
+    pub mime_type: String,
+    pub description: Option<String>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>,
+    pub thumb_url: Option<String>,
+    pub thumb_width: Option<Integer>,
+    pub thumb_height: Option<Integer>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultDocument<T> {}
+
+encode_subtypes!(InlineQueryResultDocument, 12,
+                 [0 => _type, 1 => id, 2 => title, 4 => document_url,
+                  5 => mime_type],
+                 [3 => caption, 6 => description, 7 => reply_markup,
+                  8 => input_message_content, 9 => thumb_url,
+                  10 => thumb_width, 11 => thumb_height]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultLocation<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub latitude: Float,
+    pub longitude: Float,
+    pub title: String,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>,
+    pub thumb_url: Option<String>,
+    pub thumb_width: Option<Integer>,
+    pub thumb_height: Option<Integer>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultLocation<T> {}
+
+encode_subtypes!(InlineQueryResultLocation, 10,
+                 [0 => _type, 1 => id, 2 => latitude, 3 => longitude,
+                  4 => title],
+                 [5 => reply_markup, 6 => input_message_content, 7 => thumb_url,
+                  8 => thumb_width, 9 => thumb_height]);
+
+// ---------------------------------------------------------------------------
+#[derive(Debug, PartialEq, Clone)]
+pub struct InlineQueryResultVenue<K: InputMessageContent> {
+    pub _type: String,
+    pub id: String,
+    pub latitude: Float,
+    pub longitude: Float,
+    pub title: String,
+    pub address: String,
+    pub foursquare_id: Option<String>,
+    pub reply_markup: Option<InlineKeyboardMarkup>,
+    pub input_message_content: Option<K>,
+    pub thumb_url: Option<String>,
+    pub thumb_width: Option<Integer>,
+    pub thumb_height: Option<Integer>
+}
+
+impl<T: InputMessageContent> InlineQueryResult for InlineQueryResultVenue<T> {}
+
+encode_subtypes!(InlineQueryResultVenue, 12,
+                 [0 => _type, 1 => id, 2 => latitude, 3 => longitude,
+                  4 => title, 5 => address],
+                 [6 => foursquare_id, 7 => reply_markup, 8 => input_message_content,
+                  9 => thumb_url, 10 => thumb_width, 11 => thumb_height]);
 
 // ---------------------------------------------------------------------------
 #[derive(RustcEncodable, Debug, PartialEq, Clone)]
