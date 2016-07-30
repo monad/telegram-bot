@@ -90,3 +90,5 @@ Please submit pull request against the `master` branch, unless all changes are j
 - [x] sending files ("sendAudio", "sendDocument", ...)
 - [x] More good documentation and examples
 - [x] Maybe think about multithreading stuff
+- [x] Inline support.
+- [ ] Cached inline support.
